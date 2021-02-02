@@ -2,6 +2,10 @@ import json
 from typing import List
 from pathlib import Path
 
+# Configuration global variables
+default_config_path: Path = Path('./app/default_config.json')
+config_path: Path = Path('./config.json')
+
 
 class Config:
     """
@@ -15,8 +19,45 @@ class Config:
         'console_log_level',
         'file_log_level',
         'library_log_level',
-        'discord_token_file'
+        'discord_token_file',
+        'library_logging_type'
     ]
+
+    defaultConfig: dict = {}
+
+
+def getConfiguration() -> Config:
+    """
+    Function that reads and compiles bot configuration
+    Returns:
+        Config: Bot configuration as an instance of a class
+    """
+    # Value to be returned
+    configuration: Config = Config()
+
+    # Check if default configuration file exist
+    if(not default_config_path.exists()):
+        raise(FileNotFoundError('Default Configuration File was not found!'))
+
+    # Check if user configuration file exist, if not than create one from default configuration
+    if(not config_path.exists()):
+        # Creates confguration from default config file
+        _createConfiguration()
+
+    # Compile the configuration file
+    user_configuration: Config = loadConfig(config_path)
+    default_configuration: Config = loadConfig(default_config_path)
+
+    Config.defaultConfig = default_configuration.__dict__
+
+    for _property in Config.properties:
+        if (hasattr(user_configuration, _property)):
+            setattr(configuration, _property,
+                    user_configuration.__dict__[_property])
+        else:
+            setattr(configuration, _property,
+                    default_configuration.__dict__[_property])
+    return configuration
 
 
 def loadConfig(file: Path) -> Config:
@@ -72,3 +113,18 @@ def loadJSONtext(file: Path) -> str:
         string_json: str = f.read()
 
     return string_json
+
+
+def _createConfiguration() -> None:
+    """
+    Creates user-config file based on the default_config.json
+    Intended for internal use only
+    """
+    # Read the Default Configuration file
+    with open(default_config_path, "rt") as default:
+        default_data: str = default.read()
+
+    # Create config file
+    assert(not config_path.exists())
+    with open(config_path, "wt") as f:
+        f.write(default_data)
