@@ -1,13 +1,13 @@
+# Note: This file excecutes it's code before Logging systems are loader thus logging is not possible in this file
+
+# Library includes
 import json
 from typing import List
 from pathlib import Path
 
 # App includes
 from app.Logging.LoggingGlobals import levels, console_types, logging_types
-
-# Configuration global variables
-default_config_path: Path = Path('./app/default_config.json')
-config_path: Path = Path('./config.json')
+from app.Globals import default_config_path, config_path
 
 
 class Config:

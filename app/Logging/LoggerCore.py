@@ -1,19 +1,26 @@
-from sys import stdout
-from typing import Dict, List
+
+# Library includes
 import logging
 import coloredlogs
 import os
 
+from sys import stdout
+from typing import Dict, List
+
+
 # App includes
 import app.Logging.styles as styles
+
 from app.configHandler import Config
 from app.Logging.LoggingGlobals import levels, console_types, logging_types
 
 
-# Main logging abstraction
-
-
 class Logger:
+    """
+    Main abstraction for group of multiple Loggers and logging methods.
+    There should be only one instance of this class in an running Application,
+    multiple instances may cause undefined behavior.
+    """
 
     def __init__(self, _configuration: Config):
 
@@ -50,33 +57,54 @@ class Logger:
             _activateLibrary(self)
 
     def debug(self, *args, **kwargs):
+        """
+        Prints debug level message in active loggers
+        """
         for activeLogger in self.activeLoggers.values():
             if activeLogger is not None:
                 activeLogger.debug(*args, **kwargs)
 
     def info(self, *args, **kwargs):
+        """
+        Prints info level message in active loggers
+        """
         for activeLogger in self.activeLoggers.values():
             if activeLogger is not None:
                 activeLogger.info(*args, **kwargs)
 
     def warning(self, *args, **kwargs):
+        """
+        Prints warning level message in active loggers
+        """
         for activeLogger in self.activeLoggers.values():
             if activeLogger is not None:
                 activeLogger.warning(*args, **kwargs)
 
     def error(self, *args, **kwargs):
+        """
+        Prints error level message in active loggers
+        """
         for activeLogger in self.activeLoggers.values():
             if activeLogger is not None:
                 activeLogger.error(*args, **kwargs)
 
     def critical(self, *args, **kwargs):
+        """
+        Prints critical level message in active loggers
+        """
         for activeLogger in self.activeLoggers.values():
             if activeLogger is not None:
                 activeLogger.critical(*args, **kwargs)
 
 
 def _activateConsole(context: Logger) -> None:
+    """
+    Activates and configures the console logger.
+    For internal use only
 
+    Args:
+        context (Logger): Containment for loggers
+    """
     # Setup
     logging_level: int = levels[context.consoleLevel]
     logging_type: str = context.consoleType
@@ -113,7 +141,13 @@ def _activateConsole(context: Logger) -> None:
 
 
 def _activateFile(context: Logger) -> None:
+    """
+    Activates and configures the file logger.
+    For internal use only
 
+    Args:
+        context (Logger): Containment for loggers
+    """
     # Setup
     logging_level: int = levels[context.fileLevel]
 
@@ -142,7 +176,13 @@ def _activateFile(context: Logger) -> None:
 
 
 def _activateLibrary(context: Logger) -> None:
+    """
+    Activates and configures the library logger.
+    For internal use only
 
+    Args:
+        context (Logger): Containment for loggers
+    """
     # Setup
     logging_level: int = levels[context.libraryLevel]
 
