@@ -14,7 +14,12 @@ def main() -> None:
 
     BotConfiguration: configHandler.Config = configHandler.getConfiguration()
     print(BotConfiguration.__dict__)
-    # Logger(BotConfiguration)
+    logger: Loger = Logger(BotConfiguration)
+    logger.debug("First Debug")
+    logger.info("First info")
+    logger.warning("First Warning")
+    logger.error("First error")
+    logger.critical("First Critical")
 
 
 if __name__ != '__main__':

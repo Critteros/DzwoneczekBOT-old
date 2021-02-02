@@ -2,6 +2,7 @@ from sys import stdout
 from typing import Dict, List
 import logging
 import coloredlogs
+import os
 
 # App includes
 import app.Logging.styles as styles
@@ -35,7 +36,10 @@ class Logger:
 
         # Loggers
         self.activeLoggers: Dict[any] = {
-            'console': None, 'file': None, 'library': None}
+            'console': None,
+            'file': None
+        }
+        self.aciveLibraryLogger = None
 
         # Activate Loggers
         if(self.consoleLogger):
@@ -45,6 +49,31 @@ class Logger:
         if(self.libraryLogger):
             _activateLibrary(self)
 
+    def debug(self, *args, **kwargs):
+        for activeLogger in self.activeLoggers.values():
+            if activeLogger is not None:
+                activeLogger.debug(*args, **kwargs)
+
+    def info(self, *args, **kwargs):
+        for activeLogger in self.activeLoggers.values():
+            if activeLogger is not None:
+                activeLogger.info(*args, **kwargs)
+
+    def warning(self, *args, **kwargs):
+        for activeLogger in self.activeLoggers.values():
+            if activeLogger is not None:
+                activeLogger.warning(*args, **kwargs)
+
+    def error(self, *args, **kwargs):
+        for activeLogger in self.activeLoggers.values():
+            if activeLogger is not None:
+                activeLogger.error(*args, **kwargs)
+
+    def critical(self, *args, **kwargs):
+        for activeLogger in self.activeLoggers.values():
+            if activeLogger is not None:
+                activeLogger.critical(*args, **kwargs)
+
 
 def _activateConsole(context: Logger) -> None:
 
@@ -53,7 +82,8 @@ def _activateConsole(context: Logger) -> None:
     logging_type: str = context.consoleType
     useColor: bool = True if context.consoleType == 'color' else False
 
-    logging_instance: logging.Logger = logging.getLogger('BotConsoleLogger')
+    logging_instance: logging.Logger = logging.getLogger('BotConsole')
+    logging_instance.setLevel(logging_level)
 
     if(useColor):
         coloredlogs.install(
@@ -83,8 +113,59 @@ def _activateConsole(context: Logger) -> None:
 
 
 def _activateFile(context: Logger) -> None:
-    pass
+
+    # Setup
+    logging_level: int = levels[context.fileLevel]
+
+    # Try to make a Logs directory if one does not exist
+    try:
+        os.mkdir('Logs')
+    except OSError:
+        pass
+
+    logging_instance: logging.Logger = logging.getLogger('BotFile')
+    logging_instance.setLevel(logging_level)
+
+    # Handler
+    handler: logging.FileHandler = logging.FileHandler('Logs/bot.log')
+    handler.setLevel(logging_level)
+
+    # Formatter
+    formatter: logging.Formatter = logging.Formatter(
+        fmt=styles.logging_format,
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+
+    handler.setFormatter(formatter)
+    logging_instance.addHandler(handler)
+    context.activeLoggers['file'] = logging_instance
 
 
 def _activateLibrary(context: Logger) -> None:
-    pass
+
+    # Setup
+    logging_level: int = levels[context.libraryLevel]
+
+    # Try to make a Logs directory if one does not exist
+    try:
+        os.mkdir('Logs')
+    except OSError:
+        pass
+
+    logging_instance: logging.Logger = logging.getLogger('discord')
+    logging_instance.setLevel(logging_level)
+
+    # Handler
+    handler: logging.FileHandler = logging.FileHandler(
+        'Logs/internal-discord.log')
+    handler.setLevel(logging_level)
+
+    # Formatter
+    formatter: logging.Formatter = logging.Formatter(
+        fmt=styles.logging_format,
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+
+    handler.setFormatter(formatter)
+    logging_instance.addHandler(handler)
+    context.aciveLibraryLogger = logging_instance
