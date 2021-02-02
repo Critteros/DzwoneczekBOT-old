@@ -1,5 +1,10 @@
 {
     "log_to_file": false,
     "log_to_console": true,
-    "console_logger_type": "color"
+    "console_logger_type": "color",
+    "log_library": false,
+    "console_log_level": "DEBUG",
+    "file_log_level": "DEBUG",
+    "library_log_level": "DEBUG",
+    "discord_token_file": ".discord"
 }

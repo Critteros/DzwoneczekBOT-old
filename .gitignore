@@ -1,17 +1,16 @@
+#VSCode stuff
 .vscode
 
+#Logs
+Logs/*
 
 
 
 
+#Token files
+.discord
 
-
-
-
-
-
-
-
+##########################################################################################
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
