@@ -1,0 +1,5 @@
+{
+    "log_to_file": false,
+    "log_to_console": true,
+    "console_logger_type": "color"
+}
