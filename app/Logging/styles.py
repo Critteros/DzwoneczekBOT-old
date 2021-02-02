@@ -1,7 +1,7 @@
 # File contaning logging styles
 
 
-fmt: str = "%(asctime)s | %(name)s[%(process)d] %(levelname)s: %(message)s"
+logging_format: str = "%(asctime)s | %(name)s[%(process)d] %(levelname)s: %(message)s"
 
 field_style: dict = {
     'asctime': {'color': 'white'},

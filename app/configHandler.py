@@ -2,6 +2,9 @@ import json
 from typing import List
 from pathlib import Path
 
+# App includes
+from app.Logging.LoggingGlobals import levels, console_types, logging_types
+
 # Configuration global variables
 default_config_path: Path = Path('./app/default_config.json')
 config_path: Path = Path('./config.json')
@@ -57,7 +60,60 @@ def getConfiguration() -> Config:
         else:
             setattr(configuration, _property,
                     default_configuration.__dict__[_property])
+
+    _validateConfig(configuration)
     return configuration
+
+
+def _validateConfig(config: Config) -> None:
+    """
+    Validates config file and changes values in the config if they are out of defined range to default values. For internal use only
+
+    Args:
+        config (Config): The config file to validate
+    """
+    # Defaults
+    defaults: dict = Config.defaultConfig
+
+    # Log to Console
+    specified_obj = config.log_to_console
+    if(not isinstance(specified_obj, bool)):
+        config.log_to_console = defaults['log_to_console']
+
+    # Log to file
+    specified_obj = config.log_to_file
+    if(not isinstance(specified_obj, bool)):
+        config.log_to_file = defaults['log_to_file']
+
+    # Log library
+    specified_obj = config.log_library
+    if(not isinstance(specified_obj, bool)):
+        config.log_library = defaults['log_library']
+
+    # Console Log level
+    specified_level = config.console_log_level
+    if(specified_level not in levels):
+        config.console_log_level = defaults['console_log_level']
+
+    # File Log Level
+    specified_level = config.file_log_level
+    if(specified_level not in levels):
+        config.file_log_level = defaults['file_log_level']
+
+    # Library Log Level
+    specified_level = config.library_log_level
+    if(specified_level not in levels):
+        config.library_log_level = defaults['library_log_level']
+
+    # Console logger type
+    specified_type = config.console_logger_type
+    if(specified_type not in console_types):
+        config.console_logger_type = defaults['console_logger_type']
+
+    # Library logging type
+    specified_type = config.library_logging_type
+    if(specified_type not in logging_types):
+        config.library_logging_type = defaults['library_logging_type']
 
 
 def loadConfig(file: Path) -> Config:
