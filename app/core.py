@@ -59,6 +59,35 @@ class BotRuntime:
             logger=logger,
             discord_token=discord_token
         )
+        #########################################################################################
+        # Setting up tasks to run
+        logger.debug('Setting up task to be run in event loop')
+
+        # Startup Tasks
+        self.start_tasks: list = [
+            self.test()
+        ]
+
+        # Cleanup Tasks
+        self.cleanupTasks: list = [
+            self.client.logout()
+        ]
+
+        #########################################################################################
+        # Scheduing tasks
+        logger.debug('Scheduing tasks')
+        self.activeTasks: list = []
+        self.discordClientTask: asyncio.Task = None
+
+        logger.debug('Scheduing discord client task')
+        self.discordClientTask = self.loop.create_task(
+            self.client.start(self.discord_token))
+
+        for corutine in self.start_tasks:
+            task: asyncio.Task = self.loop.create_task(corutine)
+            self.activeTasks.append(task)
+        logger.debug('Done scheduing tasks')
+        logger.debug(self.activeTasks)
 
         #########################################################################################
         global currentRuntime
@@ -67,13 +96,34 @@ class BotRuntime:
 
     def run(self):
         try:
-            self.loop.run_until_complete(self.client.start(self.discord_token))
+            self.log.info('Running event loop')
+            self.loop.run_forever()
         except KeyboardInterrupt:
             self.log.warning('Recived KeyboardInterrupt shutting down')
-            self.loop.run_until_complete(self.client.logout())
+            self.loop.run_until_complete(self.cleanup())
         finally:
-            self.log.info('Closing event loop')
+            self.log.warning('Closing event loop')
             self.loop.close()
+
+    async def cleanup(self):
+        self.log.debug('Cleaning up event loop')
+        cleanup_tasks = self.cleanupTasks
+
+        for task in cleanup_tasks:
+            self.log.debug(f'Awaiting task: {task}')
+            await task
+
+        self.log.debug('Closing app running tasks')
+        for task in self.activeTasks:
+            self.log.debug(f'Closing task {task}')
+            task.cancel()
+
+    async def test(self):
+        await self.client.wait_until_ready()
+
+        while True:
+            self.log.error("Hearthbeet")
+            await asyncio.sleep(2)
 
 
 # A container for the current runtime

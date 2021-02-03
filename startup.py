@@ -8,7 +8,6 @@ from pathlib import Path
 #########################################################################################
 # App includes
 
-
 # Types
 from app.Types import configClass
 import app.Logging.LoggerCore as LoggerCore
