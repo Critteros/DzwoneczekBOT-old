@@ -39,4 +39,5 @@ def loadDiscordToken() -> None:
         token_string: str = f.read()
 
     globals.app_logger.debug(f'Read token string from file {file_path}')
+    #globals.app_logger.debug(f'Token was: /{token_string}/')
     globals.DISCORD_TOKEN = token_string
