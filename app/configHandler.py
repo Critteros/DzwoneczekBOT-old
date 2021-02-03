@@ -9,24 +9,7 @@ from pathlib import Path
 from app.Logging.LoggingGlobals import levels, console_types, logging_types
 from app.Globals import default_config_path, config_path
 
-
-class Config:
-    """
-    This class is a template for Configurations whose atributes will be added directly the instance of this class. Property [properties] contain all attributes that config should have.
-    """
-    properties: List[str] = [
-        'log_to_file',
-        'log_to_console',
-        'console_logger_type',
-        'log_library',
-        'console_log_level',
-        'file_log_level',
-        'library_log_level',
-        'discord_token_file',
-        'library_logging_type'
-    ]
-
-    defaultConfig: dict = {}
+from app.configClass import Config
 
 
 def getConfiguration() -> Config:

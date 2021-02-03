@@ -1,8 +1,31 @@
 # This file contains all Global variables use through program lifecycle
 # this file only contains definitions of variables and will not execute any code
 
-# Additional includes
+# Library includes
+#########################################################################################
 from pathlib import Path
+#########################################################################################
+
+
+# Type includes
+#########################################################################################
+
+# Include Logger type for typing info
+from app.Logging.LoggerCore import Logger
+
+# Include Config type for typing ingo
+from app.configClass import Config
+
+#########################################################################################
+
+
+class globals:
+    # Utility classes
+    app_logger: Logger = None
+    app_configuration: Config = None
+
+    # Tokens
+    DISCORD_TOKEN: str = ''
 
 
 # Paths

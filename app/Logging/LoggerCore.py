@@ -1,18 +1,23 @@
 
 # Library includes
+#########################################################################################
 import logging
 import coloredlogs
 import os
 
 from sys import stdout
 from typing import Dict, List
-
+#########################################################################################
 
 # App includes
+#########################################################################################
+
+# Import Logger Styles
 import app.Logging.styles as styles
 
-from app.configHandler import Config
+# Import Logging Globals
 from app.Logging.LoggingGlobals import levels, console_types, logging_types
+#########################################################################################
 
 
 class Logger:
@@ -22,7 +27,7 @@ class Logger:
     multiple instances may cause undefined behavior.
     """
 
-    def __init__(self, _configuration: Config):
+    def __init__(self, _configuration):
 
         # Change instance to dict format
         configuration: dict = _configuration.__dict__
@@ -46,7 +51,7 @@ class Logger:
             'console': None,
             'file': None
         }
-        self.aciveLibraryLogger = None
+        self.acitveLibraryLogger = None
 
         # Activate Loggers
         if(self.consoleLogger):
@@ -185,6 +190,7 @@ def _activateLibrary(context: Logger) -> None:
     """
     # Setup
     logging_level: int = levels[context.libraryLevel]
+    useColor: bool = True if context.consoleType == 'color' else False
 
     # Try to make a Logs directory if one does not exist
     try:
@@ -195,10 +201,27 @@ def _activateLibrary(context: Logger) -> None:
     logging_instance: logging.Logger = logging.getLogger('discord')
     logging_instance.setLevel(logging_level)
 
-    # Handler
-    handler: logging.FileHandler = logging.FileHandler(
-        'Logs/internal-discord.log')
-    handler.setLevel(logging_level)
+    if(context.libraryLoggingType == 'file'):
+        # Handler
+        handler: logging.FileHandler = logging.FileHandler(
+            'Logs/internal-discord.log')
+        handler.setLevel(logging_level)
+    else:
+        if(useColor):
+            coloredlogs.install(
+                level=logging_level,
+                fmt=styles.logging_format,
+                level_styles=styles.level_style,
+                field_styles=styles.field_style,
+                logger=logging_instance,
+                stream=stdout
+            )
+            context.activeLibraryLogger = logging_instance
+            return None
+        else:
+            # Handler
+            handler: logging.FileHandler = logging.StreamHandler(stdout)
+            handler.setLevel(logging_level)
 
     # Formatter
     formatter: logging.Formatter = logging.Formatter(
@@ -208,4 +231,4 @@ def _activateLibrary(context: Logger) -> None:
 
     handler.setFormatter(formatter)
     logging_instance.addHandler(handler)
-    context.aciveLibraryLogger = logging_instance
+    context.activeLibraryLogger = logging_instance

@@ -13,5 +13,6 @@
     "console_logger_type": "normal",
     "library_logging_type": "file",
     
-    "discord_token_file": ".discord"
+    "discord_token_file": ".discord",
+    "command_prefix" : "?"
 }
