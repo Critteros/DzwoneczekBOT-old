@@ -30,8 +30,3 @@ class globals:
 
     # Tokens
     DISCORD_TOKEN: str = ''
-
-
-# Paths
-default_config_path: Path = Path('./app/default_config.json')
-config_path: Path = Path('./config.json')

@@ -7,12 +7,15 @@ from pathlib import Path
 
 # App includes
 from app.Logging.LoggingGlobals import levels, console_types, logging_types
-from app.Globals import default_config_path, config_path
+
 
 from app.configClass import Config
 
 
-def getConfiguration() -> Config:
+def getConfiguration(*,
+                     default_config_path: str,
+                     config_path: str
+                     ) -> Config:
     """
     Function that reads and compiles bot configuration
     Returns:
@@ -28,7 +31,10 @@ def getConfiguration() -> Config:
     # Check if user configuration file exist, if not than create one from default configuration
     if(not config_path.exists()):
         # Creates confguration from default config file
-        _createConfiguration()
+        _createConfiguration(
+            default_config_path=default_config_path,
+            config_path=config_path
+        )
 
     # Compile the configuration file
     user_configuration: Config = loadConfig(config_path)
@@ -154,7 +160,9 @@ def loadJSONtext(file: Path) -> str:
     return string_json
 
 
-def _createConfiguration() -> None:
+def _createConfiguration(*,
+                         default_config_path: str,
+                         config_path: str) -> None:
     """
     Creates user-config file based on the default_config.json
     Intended for internal use only

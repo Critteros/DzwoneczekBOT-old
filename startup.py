@@ -28,12 +28,19 @@ from app.BotClient import BotClient
 from app.core import BotRuntime
 #########################################################################################
 
+# Paths
+default_config_path: Path = Path('./app/default_config.json')
+config_path: Path = Path('./config.json')
+
 
 def main() -> None:
     print("Starting up!")
 
     # Load Configuration from JSONs
-    globals.app_configuration: Config = getConfiguration()
+    globals.app_configuration: Config = getConfiguration(
+        default_config_path=default_config_path,
+        config_path=config_path
+    )
 
     # Retrive loggers
     globals.app_logger = Logger(globals.app_configuration)
