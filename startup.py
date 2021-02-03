@@ -37,13 +37,13 @@ def main() -> None:
     app_configuration: configClass.Config  # Holds retrived app configuration
     app_logger: LoggerCore.Logger  # Holds reference to app logging system
 
-    # Step one load data from configs
+    # Step one: load data from configs
     app_configuration = configHandler.getConfiguration(
         default_config_path=default_config_path,
         config_path=config_path
     )
 
-    # Step two Setup loggers
+    # Step two: Setup loggers
     logger_context: LoggerCore.Logger = LoggerCore.Logger(
         app_configuration=app_configuration
     )
@@ -54,6 +54,8 @@ def main() -> None:
     for key, value in app_configuration.__dict__.items():
         logger_context.info(f'\t{key}: {value}')
     logger_context.info('End of configuration')
+
+    # Step three: load all tokens
 
 
     # # Load discord token

@@ -6,32 +6,41 @@ import pathlib
 #########################################################################################
 # App includes
 
+# Types
+from app.Types import configClass
 #########################################################################################
 
 
-def loadDiscordToken() -> None:
+def loadDiscordToken(*,
+                     app_configuration: configClass.Config
+                     ) -> str:
     """
-    Loads discord token string from file specfied in config entry 'discord_token_file'
-
+    Loads discord token from given file and returns it as a string
     Args:
-        config (Config): App configuration
+        app_configuration (configClass.Config): App configuration
+
+    Raises:
+        FileNotFoundError: Raises error if the token file does not exist
+
+    Returns:
+        str: Token representation as a string
     """
-    globals.app_logger.debug('Preparing to load discord token')
-    file_path: Path = Path(globals.app_configuration.discord_token_file)
-    # Check if file exist
-    if (not file_path.exists()):
-        file_path: Path = Path(
-            globals.app_configuration.defaultConfig.discord_token_file)
 
+    # Set the file pointer to file from user defined config
+    file: pathlib.Path = app_configuration.discord_token_file
+
+    # Check if file exist and if not use the default file location
+    if (not file.exists()):
+        file = app_configuration.defaultConfig['discord_token_file']
+
+    # If the file still does not exist than raise an FileNotFound error
     try:
-        assert(file_path.exists())
+        assert(file.exists())
     except AssertionError:
-        globals.app_logger.critical('Discord token file cannot be found')
-        raise RuntimeError('Cannot found discord token file')
+        raise FileNotFoundError('Cannot found discord token file')
 
-    with open(file_path, 'rt') as f:
+    # Read the token
+    with open(file, 'rt') as f:
         token_string: str = f.read()
 
-    globals.app_logger.debug(f'Read token string from file {file_path}')
-    #globals.app_logger.debug(f'Token was: /{token_string}/')
-    globals.DISCORD_TOKEN = token_string
+    return token_string
