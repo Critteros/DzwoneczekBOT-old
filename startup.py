@@ -9,14 +9,12 @@ from pathlib import Path
 # App includes
 
 
-# /NEW
-
 # Types
 from app.Types import configClass
 import app.Logging.LoggerCore as LoggerCore
 
 # StartupTasks
-from app.StartupTasks import configHandler
+from app.StartupTasks import configHandler, TokenLoader
 #########################################################################################
 
 # Paths constants
@@ -30,12 +28,14 @@ def main() -> None:
     1) Configs are loaded from JSONs and parsed
     2) Setup Loggers    
     3)Load all needed tokens
+    4)Create BotRuntime instance
     """
     print("Starting up!")
 
     # Used variables and theri explenation
     app_configuration: configClass.Config  # Holds retrived app configuration
-    app_logger: LoggerCore.Logger  # Holds reference to app logging system
+    app_logger: LoggerCore.Logger          # Holds reference to app logging system
+    DISCORD_TOKEN: str                     # Discord API token used for communication
 
     # Step one: load data from configs
     app_configuration = configHandler.getConfiguration(
@@ -43,7 +43,9 @@ def main() -> None:
         config_path=config_path
     )
 
+    #########################################################################################
     # Step two: Setup loggers
+
     logger_context: LoggerCore.Logger = LoggerCore.Logger(
         app_configuration=app_configuration
     )
@@ -55,7 +57,19 @@ def main() -> None:
         logger_context.info(f'\t{key}: {value}')
     logger_context.info('End of configuration')
 
+    logger_context.debug('End of setup phaze two: Setting up Loggers')
+    #########################################################################################
     # Step three: load all tokens
+    logger_context.debug('Setup phaze three: Loading tokens')
+
+    # Load discord token
+    logger_context.debug('Loading discord token')
+    DISCORD_TOKEN = TokenLoader.loadDiscordToken(
+        app_configuration=app_configuration)
+    logger_context.debug('Discord token file was loaded')
+
+    logger_context.debug('End of setup phaze three: Loading tokens')
+    #########################################################################################
 
 
     # # Load discord token

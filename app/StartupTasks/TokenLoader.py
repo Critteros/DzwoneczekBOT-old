@@ -27,7 +27,7 @@ def loadDiscordToken(*,
     """
 
     # Set the file pointer to file from user defined config
-    file: pathlib.Path = app_configuration.discord_token_file
+    file: pathlib.Path = pathlib.Path(app_configuration.discord_token_file)
 
     # Check if file exist and if not use the default file location
     if (not file.exists()):
