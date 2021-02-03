@@ -1,28 +1,43 @@
 # Note: This file excecutes it's code before Logging systems are loader thus logging is not possible in this file
 
-# Library includes
-import json
-from typing import List
-from pathlib import Path
 
 # App includes
 from app.Logging.LoggingGlobals import levels, console_types, logging_types
 
+# //NEW
+#########################################################################################
+# Library includes
 
-from app.configClass import Config
+import json
+import pathlib
+from typing import List
+#########################################################################################
+# App includes
+
+
+# Types
+from app.Types import configClass as configClass
+#########################################################################################
 
 
 def getConfiguration(*,
-                     default_config_path: str,
-                     config_path: str
-                     ) -> Config:
+                     default_config_path: pathlib.Path,
+                     config_path: pathlib.Path
+                     ) -> configClass.Config:
     """
     Function that reads and compiles bot configuration
     Returns:
-        Config: Bot configuration as an instance of a class
+
+    Args:
+        default_config_path (pathlib.Path): default configuration path 
+        config_path (pathlib.Path): config path 
+
+    Returns:
+        configClass.Config: App configuration as a instance of Config class
     """
+
     # Value to be returned
-    configuration: Config = Config()
+    app_configuration: configClass.Config = configClass.Config()
 
     # Check if default configuration file exist
     if(not default_config_path.exists()):
@@ -105,18 +120,21 @@ def _validateConfig(config: Config) -> None:
         config.library_logging_type = defaults['library_logging_type']
 
 
-def loadConfig(file: Path) -> Config:
+def loadConfig(*,
+               file_path: pathlib.Path
+               ) -> configClass.Config:
     """
     Loads config pointed by the file variable
 
     Args:
-        file (Path): An Path object to the desired config file
+        file_path (pathlib.Path): Path object pointing to config file in JSON format
 
     Returns:
         Config: Instance of Config class containing loaded config
     """
-    # Empty file path exception
-    if(not file.exists()):
+
+    # Ckeck if file exists
+    if(not file_path.exists()):
         raise(FileNotFoundError)
 
     config_return: Config = Config()
@@ -162,7 +180,8 @@ def loadJSONtext(file: Path) -> str:
 
 def _createConfiguration(*,
                          default_config_path: str,
-                         config_path: str) -> None:
+                         config_path: str
+                         ) -> None:
     """
     Creates user-config file based on the default_config.json
     Intended for internal use only
