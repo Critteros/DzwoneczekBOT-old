@@ -1,73 +1,91 @@
-
-# Library includes
+"""
+This file is the entrypoint of Bot application
+"""
 #########################################################################################
+# Library Includes
+
 from pathlib import Path
 #########################################################################################
-
-
 # App includes
+
+
+# Types
+from app.Types import configClass
+import app.Logging.LoggerCore as LoggerCore
+
+# StartupTasks
+from app.StartupTasks import configHandler, TokenLoader
+
+# Importing core
+import app.core as core
 #########################################################################################
 
-# Function to load configuration
-from app.configHandler import getConfiguration
-
-# TokenLoader module
-import app.TokenLoader as TokenLoader
-
-# Import Global variables
-from app.Globals import globals
-
-# Import for types
-from app.configClass import Config
-from app.Logging.LoggerCore import Logger
-
-# BotClient
-from app.BotClient import BotClient
-
-# Core
-from app.core import BotRuntime
-#########################################################################################
-
-# Paths
+# Paths constants
 default_config_path: Path = Path('./app/default_config.json')
 config_path: Path = Path('./config.json')
 
 
 def main() -> None:
+    """
+    Quick summary of how application starts:
+    1) Configs are loaded from JSONs and parsed
+    2) Setup Loggers    
+    3)Load all needed tokens
+    4)Create BotRuntime instance
+    5)Startup bot
+    """
     print("Starting up!")
 
-    # Load Configuration from JSONs
-    globals.app_configuration: Config = getConfiguration(
+    # Used variables and theri explenation
+    app_configuration: configClass.Config  # Holds retrived app configuration
+    app_logger: LoggerCore.Logger          # Holds reference to app logging system
+    DISCORD_TOKEN: str                     # Discord API token used for communication
+
+    # Step one: load data from configs
+    app_configuration = configHandler.getConfiguration(
         default_config_path=default_config_path,
         config_path=config_path
     )
 
-    # Retrive loggers
-    globals.app_logger = Logger(globals.app_configuration)
-    globals.app_logger.debug('Finished initializing loggers')
+    #########################################################################################
+    # Step two: Setup loggers
 
-    # Listing configuration
-    globals.app_logger.info('Listing Configuration:')
-    for key, value in globals.app_configuration.__dict__.items():
-        globals.app_logger.info(f'\t{key}: {value}')
-    globals.app_logger.info('End of configuration')
+    logger_context: LoggerCore.Logger = LoggerCore.Logger(
+        app_configuration=app_configuration
+    )
+    logger_context.debug('Logging is now available')
+
+    # Listing app configuration
+    logger_context.info('Listing app configuration')
+    for key, value in app_configuration.__dict__.items():
+        logger_context.info(f'\t{key}: {value}')
+    logger_context.info('End of configuration')
+
+    logger_context.debug('End of setup phaze two: Setting up Loggers')
+    #########################################################################################
+    # Step three: load all tokens
+    logger_context.debug('Setup phaze three: Loading tokens')
 
     # Load discord token
-    TokenLoader.loadDiscordToken()
+    logger_context.debug('Loading discord token')
+    DISCORD_TOKEN = TokenLoader.loadDiscordToken(
+        app_configuration=app_configuration)
+    logger_context.debug('Discord token file was loaded')
 
-    # Init Runtime and attach it to globals
-    globals.runtime = BotRuntime(
-        logger=globals.app_logger,
-        client=BotClient(
-            command_prefix=globals.app_configuration.command_prefix,
-            logger=globals.app_logger
-        ),
-        configuration=globals.app_configuration,
-        discord_token=globals.DISCORD_TOKEN
+    logger_context.debug('End of setup phaze three: Loading tokens')
+    #########################################################################################
+    # Step four: Create BotRuntime instance
+    logger_context.debug('Setup phaze four: Creating BotRuntime')
+    core.BotRuntime(
+        configuration=app_configuration,
+        logger=logger_context,
+        discord_token=DISCORD_TOKEN
     )
-
-    # Run bot
-    globals.runtime.run()
+    logger_context.debug('End of phaze four: Creating BotRuntime')
+    #########################################################################################
+    # Step five: Startup bot
+    logger_context.debug('Setup phaze five: Startup bot')
+    core.getRuntime().run()
 
 
 if __name__ != '__main__':

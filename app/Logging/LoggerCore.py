@@ -1,6 +1,8 @@
 
-# Library includes
+
 #########################################################################################
+# Library includes
+
 import logging
 import coloredlogs
 import os
@@ -8,9 +10,10 @@ import os
 from sys import stdout
 from typing import Dict, List
 #########################################################################################
-
 # App includes
-#########################################################################################
+
+# Types
+from app.Types import configClass
 
 # Import Logger Styles
 import app.Logging.styles as styles
@@ -27,30 +30,37 @@ class Logger:
     multiple instances may cause undefined behavior.
     """
 
-    def __init__(self, _configuration):
+    def __init__(self, *,
+                 app_configuration: configClass.Config
+                 ):
+        """
+        Initiates desired loggers based on the app configuration
 
-        # Change instance to dict format
-        configuration: dict = _configuration.__dict__
+        Args:
+            app_configuration (configClass.Config): The app configuration
+        """
 
         # What loggers should be activated
-        self.consoleLogger: bool = configuration['log_to_console']
-        self.fileLogger: bool = configuration['log_to_file']
-        self.libraryLogger: bool = configuration['log_library']
+        self.consoleLogger: bool = app_configuration.log_to_console
+        self.fileLogger: bool = app_configuration.log_to_file
+        self.libraryLogger: bool = app_configuration.log_library
 
         # Log levels
-        self.consoleLevel: str = configuration['console_log_level']
-        self.fileLevel: str = configuration['file_log_level']
-        self.libraryLevel: str = configuration['library_log_level']
+        self.consoleLevel: str = app_configuration.console_log_level
+        self.fileLevel: str = app_configuration.file_log_level
+        self.libraryLevel: str = app_configuration.library_log_level
 
         # Special attributes
-        self.consoleType: str = configuration['console_logger_type']
-        self.libraryLoggingType: str = configuration['library_logging_type']
+        self.consoleType: str = app_configuration.console_logger_type
+        self.libraryLoggingType: str = app_configuration.library_logging_type
 
-        # Loggers
+        # Storage for active app loggers
         self.activeLoggers: Dict[any] = {
             'console': None,
             'file': None
         }
+
+        # Storage for active library logger
         self.acitveLibraryLogger = None
 
         # Activate Loggers
@@ -61,6 +71,8 @@ class Logger:
         if(self.libraryLogger):
             _activateLibrary(self)
 
+    # Passthrough fucntions
+    #########################################################################################
     def debug(self, *args, **kwargs):
         """
         Prints debug level message in active loggers
