@@ -16,6 +16,9 @@ from app.Logging.LoggerCore import Logger
 # Include Config type for typing ingo
 from app.configClass import Config
 
+# Include core
+from app.core import BotRuntime
+
 #########################################################################################
 
 
@@ -23,6 +26,7 @@ class globals:
     # Utility classes
     app_logger: Logger = None
     app_configuration: Config = None
+    runtime: BotRuntime = None
 
     # Tokens
     DISCORD_TOKEN: str = ''

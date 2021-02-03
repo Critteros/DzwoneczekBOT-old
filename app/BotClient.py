@@ -7,15 +7,14 @@ from discord.ext import commands
 
 # App includes
 #########################################################################################
-
-# Include Globals
-from app.Globals import globals
+from app.Logging.LoggerCore import Logger
 #########################################################################################
 
 
 class BotClient(commands.Bot):
-    def __init__(self):
-        super().__init__(command_prefix=globals.app_configuration.command_prefix)
+    def __init__(self, *, command_prefix: str, logger: Logger):
+        super().__init__(command_prefix=command_prefix)
+        self.app_logger = logger
 
     async def on_ready(self):
-        globals.app_logger.info('Bot is ready!')
+        self.app_logger.info('Bot is ready!')

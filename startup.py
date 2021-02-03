@@ -23,6 +23,9 @@ from app.Logging.LoggerCore import Logger
 
 # BotClient
 from app.BotClient import BotClient
+
+# Core
+from app.core import BotRuntime
 #########################################################################################
 
 
@@ -45,8 +48,19 @@ def main() -> None:
     # Load discord token
     TokenLoader.loadDiscordToken()
 
-    client: BotClient = BotClient()
-    client.run(globals.DISCORD_TOKEN)
+    # Init Runtime and attach it to globals
+    globals.runtime = BotRuntime(
+        logger=globals.app_logger,
+        client=BotClient(
+            command_prefix=globals.app_configuration.command_prefix,
+            logger=globals.app_logger
+        ),
+        configuration=globals.app_configuration,
+        discord_token=globals.DISCORD_TOKEN
+    )
+
+    # Run bot
+    globals.runtime.run()
 
 
 if __name__ != '__main__':
