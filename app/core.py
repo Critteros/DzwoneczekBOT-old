@@ -105,7 +105,10 @@ class BotRuntime:
             self.log.warning('Closing event loop')
             self.loop.close()
 
-    async def cleanup(self):
+    async def cleanup(self) -> None:
+        """
+        Function to clean up the event loop
+        """
         self.log.debug('Cleaning up event loop')
         cleanup_tasks = self.cleanupTasks
 
