@@ -12,11 +12,11 @@ from pathlib import Path
 # /NEW
 
 # Types
-import app.Types as Types
+from app.Types import configClass
 import app.Logging.LoggerCore as LoggerCore
 
 # StartupTasks
-import app.StartupTasks as StartupTasks
+from app.StartupTasks import configHandler
 #########################################################################################
 
 # Paths constants
@@ -27,22 +27,22 @@ config_path: Path = Path('./config.json')
 def main() -> None:
     """
     Quick summary of how application starts:
-    1) Configs are loaded from JSONs and parsed 
+    1) Configs are loaded from JSONs and parsed
+    2) Setup Loggers    
     """
     print("Starting up!")
 
     # Used variables and theri explenation
-    app_configuration: Types.configClass.Config  # Holds retrived app configuration
+    app_configuration: configClass.Config  # Holds retrived app configuration
     app_logger: LoggerCore.Logger  # Holds reference to app logging system
 
     # Step one load data from configs
-    app_configuration = StartupTasks.config_handler.getConfiguration()
+    app_configuration = configHandler.getConfiguration(
+        default_config_path=default_config_path,
+        config_path=config_path
+    )
 
-    # # Load Configuration from JSONs
-    # globals.app_configuration: Config = getConfiguration(
-    #     default_config_path=default_config_path,
-    #     config_path=config_path
-    # )
+    # Step two Setup loggers
 
     # # Retrive loggers
     # globals.app_logger = Logger(globals.app_configuration)

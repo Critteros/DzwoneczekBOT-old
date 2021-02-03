@@ -11,7 +11,7 @@ from typing import List
 # App includes
 
 # Types
-from app.Types import configClass as configClass
+from app.Types import configClass
 
 # Predefined Logging Constants used to validate config files
 from app.Logging.LoggingGlobals import levels, console_types, logging_types
