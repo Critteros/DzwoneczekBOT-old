@@ -1,35 +1,69 @@
-# File that holds main Runtime class
+# File that holds main Runtime class and can be included in every file in project without problems with imports
 
 # Library includes
 #########################################################################################
 import asyncio
 #########################################################################################
-
 # App includes
-#########################################################################################
+
 
 # Include types
+from app.Types import configClass
+from app.Logging import LoggerCore
+
+# Bot client
 from app.BotClient import BotClient
-from app.Logging.LoggerCore import Logger
-from app.configClass import Config
 
 #########################################################################################
 
 
 class BotRuntime:
     def __init__(self, *,
-                 logger: Logger,
-                 client: BotClient,
-                 configuration: Config,
+                 configuration: configClass.Config,
+                 logger: LoggerCore.Logger,
                  discord_token: str
                  ):
+        """
+        This initiates the BotRuntime and saves information abot current running application, there should be only one instance of this class!
+        Instance after initialisation is saved to currentRuntime variable in this module, getRuntime() returns current runtime object
+
+        Args:
+            configuration (configClass.Config): App configuration object
+            logger (LoggerCore.Logger): App logger instance
+            discord_token (str): Discord API key
+
+        Returns:
+            BotRuntime: Initialisated Runtime
+        """
+        logger.debug('Initializing BotRuntime instance')
 
         # Attach info about Runtime
-        self.log = logger
-        self.client = client
-        self.loop = asyncio.get_event_loop()
-        self.configuration = configuration
-        self.discord_token = discord_token
+        #########################################################################################
+        logger.debug('Attaching logger')
+        self.log: LoggerCore.Logger = logger
+
+        logger.debug('Attaching event-loop')
+        self.loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
+
+        logger.debug('Attaching bot-configuration')
+        self.configuration: configClass.Config = configuration
+
+        logger.debug('Attaching discord token')
+        self.discord_token: str = discord_token
+        #########################################################################################
+        # Setting up client
+
+        logger.debug('Setting up BotClient')
+        self.client: BotClient = BotClient(
+            command_prefix=configuration.discord_token_file,
+            logger=logger,
+            discord_token=discord_token
+        )
+
+        #########################################################################################
+        global currentRuntime
+        currentRuntime = self
+        logger.debug('End of Runtime initialization')
 
     def run(self):
         try:
@@ -40,3 +74,17 @@ class BotRuntime:
         finally:
             self.log.info('Closing event loop')
             self.loop.close()
+
+
+# A container for the current runtime
+currentRuntime: BotRuntime = None
+
+
+def getRuntime() -> BotRuntime:
+    """
+    This function is getter for the current runtime object
+
+    Returns:
+        BotRuntime: Current runtime
+    """
+    return currentRuntime

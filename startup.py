@@ -15,6 +15,9 @@ import app.Logging.LoggerCore as LoggerCore
 
 # StartupTasks
 from app.StartupTasks import configHandler, TokenLoader
+
+# Importing core
+import app.core as core
 #########################################################################################
 
 # Paths constants
@@ -29,6 +32,7 @@ def main() -> None:
     2) Setup Loggers    
     3)Load all needed tokens
     4)Create BotRuntime instance
+    5)Startup bot
     """
     print("Starting up!")
 
@@ -70,22 +74,20 @@ def main() -> None:
 
     logger_context.debug('End of setup phaze three: Loading tokens')
     #########################################################################################
+    # Step four: Create BotRuntime instance
+    logger_context.debug('Setup phaze four: Creating BotRuntime')
+    core.BotRuntime(
+        configuration=app_configuration,
+        logger=logger_context,
+        discord_token=DISCORD_TOKEN
+    )
+    logger_context.debug('End of phaze four: Creating BotRuntime')
+    #########################################################################################
+    # Step five: Startup bot
+    logger_context.debug('Setup phaze five: Startup bot')
+    core.getRuntime().run()
 
 
-    # # Load discord token
-    # TokenLoader.loadDiscordToken()
-    # # Init Runtime and attach it to globals
-    # globals.runtime = BotRuntime(
-    #     logger=globals.app_logger,
-    #     client=BotClient(
-    #         command_prefix=globals.app_configuration.command_prefix,
-    #         logger=globals.app_logger
-    #     ),
-    #     configuration=globals.app_configuration,
-    #     discord_token=globals.DISCORD_TOKEN
-    # )
-    # # Run bot
-    # globals.runtime.run()
 if __name__ != '__main__':
     print("Wrong file was run!\nRun file 'startup.py' instead")
 else:
