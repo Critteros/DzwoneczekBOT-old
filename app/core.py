@@ -18,6 +18,9 @@ from app.Logging import LoggerCore
 # Bot client
 from app.BotClient import BotClient
 
+# Banners
+import app.Logging.Banners.LoggingBanners as Banners
+
 #########################################################################################
 
 
@@ -183,7 +186,7 @@ class BotRuntime:
 
     def run(self):
         try:
-            self.log.info('End of setup')
+            self.log.info(Banners.end_of_setup)
             self.log.warning('Running event loop')
             self.loop.run_forever()
         except KeyboardInterrupt:

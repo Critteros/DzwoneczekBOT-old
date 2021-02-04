@@ -17,6 +17,9 @@ from app.StartupTasks import configHandler, TokenLoader
 
 # Importing core
 import app.core as core
+
+# Logging Banners
+import app.Logging.Banners.LoggingBanners as Banners
 #########################################################################################
 
 # Paths constants
@@ -53,12 +56,15 @@ def main() -> None:
         app_configuration=app_configuration
     )
     logger_context.info('Logging is now available')
+    logger_context.info(Banners.setup_phaze)
 
     # Listing app configuration
-    logger_context.info('Listing app configuration')
+    logger_context.info(Banners.config)
+    logger_context.warning('Listing app configuration')
     for key, value in app_configuration.__dict__.items():
-        logger_context.info(f'\t{key}: {value}')
-    logger_context.info('End of configuration')
+        logger_context.info(f'\t-> {key}: {value}')
+    logger_context.warning('End of configuration')
+    logger_context.info(Banners.config)
 
     logger_context.info('End of setup phaze two: Setting up Loggers')
     #########################################################################################
