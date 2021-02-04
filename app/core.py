@@ -3,6 +3,7 @@
 # Library includes
 #########################################################################################
 import asyncio
+from types import CoroutineType
 #########################################################################################
 # App includes
 
@@ -18,6 +19,33 @@ from app.BotClient import BotClient
 
 
 class BotRuntime:
+    """
+        Main Runtime class that contain critical information about app execution
+    """
+    # Class stuff
+    #########################################################################################
+
+    # Container for tasks
+    app_tasks: list = []
+
+    @classmethod
+    def newTask(cls, *args, **kwargs):
+        """
+            Decorator for adding a coroutine to an event loop
+        """
+        # Don't even try to understand this magic
+        def decorator(function: CoroutineType):
+            async def wrapper(*args, **kwargs):
+                await (getRuntime().client.wait_until_ready())
+                await function(*args, **kwargs)
+
+            cls.app_tasks.append(wrapper(*args, **kwargs))
+            return wrapper
+
+        return decorator
+
+    # Instance stuff
+    #########################################################################################
     def __init__(self, *,
                  configuration: configClass.Config,
                  logger: LoggerCore.Logger,
@@ -63,14 +91,14 @@ class BotRuntime:
         # Setting up tasks to run
         logger.debug('Setting up task to be run in event loop')
 
-        # Startup Tasks
-        self.start_tasks: list = [
-            self.test()
-        ]
-
         # Cleanup Tasks
         self.cleanupTasks: list = [
             self.client.logout()
+        ]
+
+        # Startup Tasks
+        self.start_tasks: list = [
+
         ]
 
         #########################################################################################
@@ -89,10 +117,16 @@ class BotRuntime:
         logger.debug('Done scheduing tasks')
         logger.debug(self.activeTasks)
 
+        # Test
+        for corutine in BotRuntime.app_tasks:
+            task: asyncio.Task = self.loop.create_task(corutine)
+            self.activeTasks.append(task)
+
         #########################################################################################
+        logger.debug('End of Runtime initialization')
         global currentRuntime
         currentRuntime = self
-        logger.debug('End of Runtime initialization')
+        self.client.command()
 
     def run(self):
         try:
@@ -121,13 +155,6 @@ class BotRuntime:
             self.log.debug(f'Closing task {task}')
             task.cancel()
 
-    async def test(self):
-        await self.client.wait_until_ready()
-
-        while True:
-            self.log.error("Hearthbeet")
-            await asyncio.sleep(2)
-
 
 # A container for the current runtime
 currentRuntime: BotRuntime = None
@@ -138,6 +165,15 @@ def getRuntime() -> BotRuntime:
     This function is getter for the current runtime object
 
     Returns:
-        BotRuntime: Current runtime
+    BotRuntime: Current runtime
     """
+    global currentRuntime
     return currentRuntime
+
+
+@BotRuntime.newTask('abba')
+async def test(string):
+    runtime: BotRuntime = getRuntime()
+    while True:
+        runtime.log.error(f'Value: {string}')
+        await asyncio.sleep(3)
