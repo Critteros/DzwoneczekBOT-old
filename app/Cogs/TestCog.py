@@ -20,7 +20,6 @@ class TestCog(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.runtime.log.info('Bot is ready')
-        self.runtime.log.debug(self.runtime.__dict__)
 
 
 def setup(client):
