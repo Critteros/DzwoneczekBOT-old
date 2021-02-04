@@ -10,7 +10,6 @@ import queue
 #########################################################################################
 # App includes
 
-
 # Include types
 from app.Types import configClass
 from app.Logging import LoggerCore
@@ -156,6 +155,9 @@ class BotRuntime:
         )
         logger.info('Done setting up Discord Client')
         #########################################################################################
+        # Loading cogs
+
+        #########################################################################################
         # Scheduing tasks
 
         # Scheduing discord API run
@@ -242,11 +244,3 @@ def getRuntime() -> BotRuntime:
     """
     global currentRuntime
     return currentRuntime
-
-
-@BotRuntime.newStartupTask('lalalal')
-async def test(string):
-    runtime: BotRuntime = getRuntime()
-    while True:
-        runtime.log.error(f'Value: {string}')
-        await asyncio.sleep(3)

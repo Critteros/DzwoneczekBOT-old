@@ -20,6 +20,10 @@ import app.core as core
 
 # Logging Banners
 import app.Logging.Banners.LoggingBanners as Banners
+
+#########################################################################################
+# Task primer
+from app.AsyncTasks import *
 #########################################################################################
 
 # Paths constants
