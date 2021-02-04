@@ -151,7 +151,8 @@ class BotRuntime:
         self.client: BotClient = BotClient(
             command_prefix=configuration.discord_token_file,
             logger=logger,
-            discord_token=discord_token
+            discord_token=discord_token,
+            runtime=self
         )
         logger.info('Done setting up Discord Client')
         #########################################################################################

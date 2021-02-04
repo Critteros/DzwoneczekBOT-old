@@ -3,6 +3,7 @@
 # Library includes
 #########################################################################################
 from discord.ext import commands
+import pathlib
 #########################################################################################
 # App includes
 
@@ -14,7 +15,8 @@ class BotClient(commands.Bot):
     def __init__(self, *,
                  command_prefix: str,
                  logger: LoggerCore.Logger,
-                 discord_token: str
+                 discord_token: str,
+                 runtime
                  ):
         """
         This is app subclass of command.Bot client
@@ -27,6 +29,7 @@ class BotClient(commands.Bot):
         Returns:
             BotClient instance
         """
+
         # Calling super class constructor
         logger.debug(
             f'Calling commands.Bot constructor with prefix: {command_prefix}')
@@ -36,8 +39,24 @@ class BotClient(commands.Bot):
         logger.debug('Attching BotClient properties')
         self.app_logger: LoggerCore.Logger = logger
         self.discord_token: str = discord_token
+        self.runtime = runtime
+
+        # Loading cogs
+        self.app_logger.info('Loading cogs')
+        cogs_dir: str = './app/Cogs/'
+        directory: pathlib.Path = pathlib.Path(cogs_dir)
+
+        for file in directory.iterdir():
+            file_name: str = file.name
+
+            if (file_name.endswith('py')):
+                cog_name: str = f'app.Cogs.{file_name[:-3]}'
+                self.app_logger.info(f'Adding Cog: {cog_name}')
+                self.load_extension(cog_name)
+
+        self.app_logger.info('Finished loading cogs')
 
         logger.debug('End of BotClient initialization')
 
-    async def on_ready(self):
-        self.app_logger.info('Bot is ready!')
+    # async def on_ready(self):
+    #     self.app_logger.info('Bot is ready!')
