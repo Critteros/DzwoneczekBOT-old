@@ -26,7 +26,8 @@ class TestCog(commands.Cog):
         self.log.debug(f'Context is: {ctx.__dict__}')
         self.log.debug(f'Context type is {type(ctx)}')
         self.log.debug(f'Context message: {ctx.args}')
-        self.log.debug(f'data is: {args}\n data type is{type(args)}')
+
+        self.log.debug(f'data is: /{args}/\n data type is{type(args)}')
         await ctx.message.reply("Hi")
 
 
