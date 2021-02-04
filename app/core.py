@@ -37,7 +37,7 @@ class BotRuntime:
     #########################################################################################
 
     @classmethod
-    def newTask(cls, *args, **kwargs):
+    def newStartupTask(cls, *args, **kwargs):
         """
             Decorator for adding a coroutine to an event loop
 
@@ -124,60 +124,67 @@ class BotRuntime:
         Returns:
             BotRuntime: Initialisated Runtime
         """
-        logger.debug('Initializing BotRuntime instance')
+        logger.info('Initializing BotRuntime instance')
 
         # Attach info about Runtime
         #########################################################################################
-        logger.debug('Attaching logger')
+        logger.info('Attaching logger to runtime')
         self.log: LoggerCore.Logger = logger
 
-        logger.debug('Attaching event-loop')
+        logger.info('Attaching event-loop to runtime')
         self.loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
 
-        logger.debug('Attaching bot-configuration')
+        logger.info('Attaching bot-configuration to runtime')
         self.configuration: configClass.Config = configuration
 
-        logger.debug('Attaching discord token')
+        logger.info('Attaching discord token to runtime')
         self.discord_token: str = discord_token
 
-        logger.debug('Creating task queque object')
+        logger.info('Creating task queque object')
         self.task_queue: queue.Queue = queue.Queue()
         #########################################################################################
         # Setting up the client
 
-        logger.debug('Setting up BotClient')
+        logger.info('Setting up BotClient')
         self.client: BotClient = BotClient(
             command_prefix=configuration.discord_token_file,
             logger=logger,
             discord_token=discord_token
         )
+        logger.info('Done setting up Discord Client')
         #########################################################################################
         # Scheduing tasks
 
         # Scheduing discord API run
-        logger.debug('Scheduing discord client task')
+        logger.info('Scheduling main discord client task')
         self.loop.create_task(self.client.start(self.discord_token))
+        logger.info('Done scheduling discord client task')
 
         # Heping variables
         to_schedue: queue.Queue = BotRuntime.app_coroutines
         loop = self.loop
 
+        logger.info('Scheduling StartupTasks from decorator')
         while(not to_schedue.empty()):
             curr_coro: asyncio.Task = to_schedue.get()
             logger.debug(f'Scheduing task: {curr_coro}')
             self.task_queue.put(loop.create_task(curr_coro))
 
-        logger.debug('Done scheduing tasks')
-        logger.debug(self.task_queue)
+        logger.info('Done scheduing startup tasks')
+        logger.debug(f'Task queque is: {self.task_queue}')
 
         #########################################################################################
-        logger.debug('End of Runtime initialization')
+        logger.info('End of Runtime initialization')
         global currentRuntime
         currentRuntime = self
 
+        # End of initialization
+        #########################################################################################
+
     def run(self):
         try:
-            self.log.info('Running event loop')
+            self.log.info('End of setup')
+            self.log.warning('Running event loop')
             self.loop.run_forever()
         except KeyboardInterrupt:
             self.log.warning('Recived KeyboardInterrupt shutting down')
@@ -196,7 +203,7 @@ class BotRuntime:
         task_queque = self.task_queue
         logger = self.log
 
-        logger.debug('Cleaning up event loop')
+        logger.info('Cleaning up event loop')
 
         # Terminating all tasks
         logger.info('Closing all running tasks')
@@ -213,7 +220,7 @@ class BotRuntime:
             await curr_coro
 
         # Logging out of discord API
-        logger.info('Logging out of discord')
+        logger.warning('Logging out of discord')
         await self.client.logout()
 
         logger.info('Finished Cleanup!')
@@ -234,7 +241,7 @@ def getRuntime() -> BotRuntime:
     return currentRuntime
 
 
-@BotRuntime.newTask('abba')
+@BotRuntime.newStartupTask('lalalal')
 async def test(string):
     runtime: BotRuntime = getRuntime()
     while True:

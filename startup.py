@@ -52,7 +52,7 @@ def main() -> None:
     logger_context: LoggerCore.Logger = LoggerCore.Logger(
         app_configuration=app_configuration
     )
-    logger_context.debug('Logging is now available')
+    logger_context.info('Logging is now available')
 
     # Listing app configuration
     logger_context.info('Listing app configuration')
@@ -60,30 +60,30 @@ def main() -> None:
         logger_context.info(f'\t{key}: {value}')
     logger_context.info('End of configuration')
 
-    logger_context.debug('End of setup phaze two: Setting up Loggers')
+    logger_context.info('End of setup phaze two: Setting up Loggers')
     #########################################################################################
     # Step three: load all tokens
-    logger_context.debug('Setup phaze three: Loading tokens')
+    logger_context.info('Setup phaze three: Loading tokens')
 
     # Load discord token
-    logger_context.debug('Loading discord token')
+    logger_context.info('Loading discord token')
     DISCORD_TOKEN = TokenLoader.loadDiscordToken(
         app_configuration=app_configuration)
-    logger_context.debug('Discord token file was loaded')
+    logger_context.info('Discord token file was loaded')
 
-    logger_context.debug('End of setup phaze three: Loading tokens')
+    logger_context.info('End of setup phaze three: Loading tokens')
     #########################################################################################
     # Step four: Create BotRuntime instance
-    logger_context.debug('Setup phaze four: Creating BotRuntime')
+    logger_context.info('Setup phaze four: Creating BotRuntime')
     core.BotRuntime(
         configuration=app_configuration,
         logger=logger_context,
         discord_token=DISCORD_TOKEN
     )
-    logger_context.debug('End of phaze four: Creating BotRuntime')
+    logger_context.info('End of phaze four: Creating BotRuntime')
     #########################################################################################
     # Step five: Startup bot
-    logger_context.debug('Setup phaze five: Startup bot')
+    logger_context.info('Setup phaze five: Startup bot')
     core.getRuntime().run()
 
 
