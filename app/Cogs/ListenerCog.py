@@ -4,7 +4,6 @@
 # Library includes
 
 from discord.ext import commands
-from discord.ext.commands.context import Context
 #########################################################################################
 # App includes
 
@@ -12,22 +11,16 @@ from app.core import BotRuntime, getRuntime, BotClient
 #########################################################################################
 
 
-class TestCog(commands.Cog):
+class ListenerCog(commands.Cog):
 
     def __init__(self, client: BotClient):
         self.client: BotClient = client
         self.runtime: BotRuntime = client.runtime
-        self.log = self.runtime.log
 
-    @commands.command()
-    async def echo(self, ctx: Context, *args):
-        self.log.debug('Executing echo command')
-        self.log.debug(f'Context is: {ctx.__dict__}')
-        self.log.debug(f'Context type is {type(ctx)}')
-        self.log.debug(f'Context message: {ctx.args}')
-        self.log.debug(f'data is: {args}\n data type is{type(args)}')
-        await ctx.message.reply("Hi")
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.runtime.log.info('Bot is ready')
 
 
 def setup(client):
-    client.add_cog(TestCog(client))
+    client.add_cog(ListenerCog(client))

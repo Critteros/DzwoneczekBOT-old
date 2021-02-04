@@ -11,9 +11,9 @@ from app.core import BotRuntime, getRuntime
 #########################################################################################
 
 
-@BotRuntime.newStartupTask('lalalal')
-async def test(string):
-    runtime: BotRuntime = getRuntime()
-    while True:
-        runtime.log.error(f'Value: {string}')
-        await asyncio.sleep(3)
+# @BotRuntime.newStartupTask('Background Task')
+# async def test(string):
+#     runtime: BotRuntime = getRuntime()
+#     while True:
+#         runtime.log.warning(f'{string}')
+#         await asyncio.sleep(5)

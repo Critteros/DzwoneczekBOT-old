@@ -149,7 +149,7 @@ class BotRuntime:
 
         logger.info('Setting up BotClient')
         self.client: BotClient = BotClient(
-            command_prefix=configuration.discord_token_file,
+            command_prefix=configuration.command_prefix,
             logger=logger,
             discord_token=discord_token,
             runtime=self

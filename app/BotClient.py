@@ -32,7 +32,7 @@ class BotClient(commands.Bot):
 
         # Calling super class constructor
         logger.debug(
-            f'Calling commands.Bot constructor with prefix: {command_prefix}')
+            f'Calling commands.Bot constructor with prefix: /{command_prefix}/')
         super().__init__(command_prefix=command_prefix)
 
         # Attaching client properties
