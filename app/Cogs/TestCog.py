@@ -20,6 +20,7 @@ class TestCog(commands.Cog):
         self.log = self.runtime.log
 
     @commands.command()
+    @commands.guild_only()
     async def echo(self, ctx: Context, *args):
         self.log.debug('Executing echo command')
         self.log.debug(f'Context is: {ctx.__dict__}')
