@@ -4,6 +4,9 @@
 #########################################################################################
 import asyncio
 from types import CoroutineType
+
+# Data structures
+import queue
 #########################################################################################
 # App includes
 
@@ -25,8 +28,9 @@ class BotRuntime:
     # Class stuff
     #########################################################################################
 
-    # Container for tasks
-    app_tasks: list = []
+    # Container for app coroutines
+    app_coroutines: queue.Queue = queue.Queue()
+    cleanup_coroutines: queue.Queue = queue.Queue()
 
     # Decorators
     # If you do not know how decorators work than skip this part it's called magic
@@ -59,7 +63,41 @@ class BotRuntime:
                 await function(*args, **kwargs)
 
             # Append to queque courutine call
-            cls.app_tasks.append(wrapper(*args, **kwargs))
+            cls.app_coroutines.put(wrapper(*args, **kwargs))
+
+            # Return decorated function
+            return wrapper
+
+        # Return main decorator from primer decorator
+        return decorator
+
+    @classmethod
+    def newCleanupTask(cls, *args, **kwargs):
+        """
+            Decorator for adding a cleanup coroutine to an event loop cleanup process
+
+            In more technical point of view this is decorator primer which primes the decorator() function.
+            decorator() function than decorates given function using it's wrapper() function
+        """
+
+        def decorator(function: CoroutineType):
+            """
+                Main decorator which decorates async function
+            Args:
+                function (CoroutineType): [description]
+            """
+
+            async def wrapper(*args, **kwargs):
+                """
+                    Wrapper around passed function
+                """
+                # Make sure that bot has connected to discord before doing anything
+                await (getRuntime().client.wait_until_ready())
+                # Original function
+                await function(*args, **kwargs)
+
+            # Append to queque courutine call
+            cls.cleanup_coroutines.put(wrapper(*args, **kwargs))
 
             # Return decorated function
             return wrapper
@@ -101,8 +139,11 @@ class BotRuntime:
 
         logger.debug('Attaching discord token')
         self.discord_token: str = discord_token
+
+        logger.debug('Creating task queque object')
+        self.task_queue: queue.Queue = queue.Queue()
         #########################################################################################
-        # Setting up client
+        # Setting up the client
 
         logger.debug('Setting up BotClient')
         self.client: BotClient = BotClient(
@@ -111,45 +152,28 @@ class BotRuntime:
             discord_token=discord_token
         )
         #########################################################################################
-        # Setting up tasks to run
-        logger.debug('Setting up task to be run in event loop')
-
-        # Cleanup Tasks
-        self.cleanupTasks: list = [
-            self.client.logout()
-        ]
-
-        # Startup Tasks
-        self.start_tasks: list = [
-
-        ]
-
-        #########################################################################################
         # Scheduing tasks
-        logger.debug('Scheduing tasks')
-        self.activeTasks: list = []
-        self.discordClientTask: asyncio.Task = None
 
+        # Scheduing discord API run
         logger.debug('Scheduing discord client task')
-        self.discordClientTask = self.loop.create_task(
-            self.client.start(self.discord_token))
+        self.loop.create_task(self.client.start(self.discord_token))
 
-        for corutine in self.start_tasks:
-            task: asyncio.Task = self.loop.create_task(corutine)
-            self.activeTasks.append(task)
+        # Heping variables
+        to_schedue: queue.Queue = BotRuntime.app_coroutines
+        loop = self.loop
+
+        while(not to_schedue.empty()):
+            curr_coro: asyncio.Task = to_schedue.get()
+            logger.debug(f'Scheduing task: {curr_coro}')
+            self.task_queue.put(loop.create_task(curr_coro))
+
         logger.debug('Done scheduing tasks')
-        logger.debug(self.activeTasks)
-
-        # Test
-        for corutine in BotRuntime.app_tasks:
-            task: asyncio.Task = self.loop.create_task(corutine)
-            self.activeTasks.append(task)
+        logger.debug(self.task_queue)
 
         #########################################################################################
         logger.debug('End of Runtime initialization')
         global currentRuntime
         currentRuntime = self
-        self.client.command()
 
     def run(self):
         try:
@@ -166,17 +190,33 @@ class BotRuntime:
         """
         Function to clean up the event loop
         """
-        self.log.debug('Cleaning up event loop')
-        cleanup_tasks = self.cleanupTasks
 
-        for task in cleanup_tasks:
-            self.log.debug(f'Awaiting task: {task}')
-            await task
+        # Helper variables
+        cleanup_tasks = BotRuntime.cleanup_coroutines
+        task_queque = self.task_queue
+        logger = self.log
 
-        self.log.debug('Closing app running tasks')
-        for task in self.activeTasks:
-            self.log.debug(f'Closing task {task}')
-            task.cancel()
+        logger.debug('Cleaning up event loop')
+
+        # Terminating all tasks
+        logger.info('Closing all running tasks')
+        while (not task_queque.empty()):
+            curr_task: asyncio.Task = task_queque.get()
+            logger.debug(f'Closing task: {curr_task}')
+            curr_task.cancel()
+
+        # Processing all cleanup coros
+        logger.info('Processing all cleanup coros')
+        while (not cleanup_tasks.empty()):
+            curr_coro = cleanup_tasks.get()
+            logger.debug(f'Processing cleanup_coro: {curr_coro}')
+            await curr_coro
+
+        # Logging out of discord API
+        logger.info('Logging out of discord')
+        await self.client.logout()
+
+        logger.info('Finished Cleanup!')
 
 
 # A container for the current runtime
