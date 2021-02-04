@@ -38,6 +38,11 @@ class ListenerCog(commands.Cog):
                 f'User: "{ctx.author.name}" id:{ctx.author.id} attempted to use command "{ctx.command}" in private DM which is not permitted')
             await ctx.reply(f'Command "{ctx.command}" cannot be used in a private message. Sorry :(')
 
+        if(isinstance(error, commands.MissingPermissions)):
+            self.log.warning(
+                f'User: "{ctx.author.name}" id:{ctx.author.id} attempted to use command "{ctx.command}" without needed permissions')
+            await ctx.reply('You need Admin permissions to use that command')
+
 
 def setup(client):
     client.add_cog(ListenerCog(client))

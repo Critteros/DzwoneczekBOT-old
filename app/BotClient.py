@@ -26,7 +26,9 @@ def _getPrefix(default_prefix: str):
             prefixes.append('?')
         else:
             guild_id: int = msg.guild.id
-            prefixes.extend(bot.data_model.get(guild_id, [default_prefix]))
+            current_server_prefix: str = bot.data_model.get(
+                guild_id, {'command_prefix': default_prefix})['command_prefix']
+            prefixes.extend(current_server_prefix)
 
         return prefixes
     return wrapper
