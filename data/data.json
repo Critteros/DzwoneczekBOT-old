@@ -1,5 +1,8 @@
 {
     "792497879175397456": {
-        "command_prefix": "?"
+        "command_prefix": "!"
+    },
+    "test": {
+        "some_key": 1234
     }
 }

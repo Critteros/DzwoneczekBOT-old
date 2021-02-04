@@ -44,11 +44,10 @@ class Data:
         except (OSError, json.JSONDecodeError, FileNotFoundError):
             self._data: dict = {}
 
-        #self._data = {"alan": "sadasdasd", "sadasd": True}
-
     #########################################################################################
 
     # Main fuction to dump data to file
+
     def _dump(self) -> None:
         now_time = datetime.now().strftime(date_format)
         tmp_file_name: str = f'{now_time}.tmp.json'
@@ -69,7 +68,7 @@ class Data:
 
     def get(self, key: Any, *args) -> Any:
         """
-        Gets specified key from data 
+        Gets specified key from data
 
         Args:
             key (Any): key to be accesed
@@ -78,6 +77,17 @@ class Data:
             Any: Returns value from a given key
         """
         return self._data.get(str(key), *args)
+
+    def peek(self, path_to_value: Any, *args) -> Any:
+        path_to_value: str = str(path_to_value)
+        splited = path_to_value.split('/')
+        value = self._data
+
+        for key in splited:
+            if(not isinstance(value, dict)):
+                break
+            value = value.get(key, *args)
+        return value
 
     #########################################################################################
     # Async stuff
@@ -106,3 +116,46 @@ class Data:
         """
         self._data[str(key)] = value
         await self.save()
+
+    async def update(self, root: Any, var_name: Any, new_value: Any):
+
+        # Convert values to strings
+        root: str = str(root)
+        var_name: str = str(var_name)
+
+        # Create pathfinder
+        path = root.split('/')
+
+        value = self._data
+        for point in path:
+            if(point == ''):
+                break
+
+            try:
+                assert isinstance(value, (list, dict))
+            except AssertionError:
+                raise RuntimeError('Bad DataBase Entry')
+
+            if isinstance(value, dict):
+                value = value[point]
+            elif isinstance(value, list):
+                value = value[int(key)]
+
+        try:
+            assert isinstance(value, (list, dict))
+        except AssertionError:
+            raise RuntimeError('Bad DataBase Entry')
+
+        if isinstance(value, dict):
+            value[var_name] = new_value
+        elif isinstance(value, list):
+            value[int(var_name)] = new_value
+
+        await self.save()
+
+
+# obj = Data()
+# asyncio.get_event_loop().run_until_complete(
+#     obj.update('', 'test', {"some_key": 1234}))
+
+# print(obj.peek('test'))
