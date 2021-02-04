@@ -19,9 +19,14 @@ date_format: str = "%d-%m-%y--%H:%M:%S"
 
 
 class Data:
+    """
+    Data Model used in the application
+    """
 
     def __init__(self):
-
+        """
+        Creates new data model
+        """
         # Lock that will be used in async functions
         self.lock = asyncio.Lock()
         self.loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()

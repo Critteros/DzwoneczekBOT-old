@@ -21,6 +21,9 @@ import app.core as core
 # Logging Banners
 import app.Logging.Banners.LoggingBanners as Banners
 
+# Import Data Model
+import app.DataModel as DataModel
+
 #########################################################################################
 # Task primer
 from app.AsyncTasks import *
@@ -37,8 +40,9 @@ def main() -> None:
     1) Configs are loaded from JSONs and parsed
     2) Setup Loggers    
     3)Load all needed tokens
-    4)Create BotRuntime instance
-    5)Startup bot
+    4)Initialize Data Model
+    5)Create BotRuntime instance
+    6)Startup bot
     """
     print("Starting up!")
 
@@ -46,6 +50,7 @@ def main() -> None:
     app_configuration: configClass.Config  # Holds retrived app configuration
     app_logger: LoggerCore.Logger          # Holds reference to app logging system
     DISCORD_TOKEN: str                     # Discord API token used for communication
+    data_model: DataModel.Data             # Data model used in the application
 
     # Step one: load data from configs
     app_configuration = configHandler.getConfiguration(
@@ -83,17 +88,25 @@ def main() -> None:
 
     logger_context.info('End of setup phaze three: Loading tokens')
     #########################################################################################
-    # Step four: Create BotRuntime instance
-    logger_context.info('Setup phaze four: Creating BotRuntime')
+    # Step four: Create Data Model
+    logger_context.info('Setup phaze four: Create Data Model')
+
+    data_model = DataModel.Data()
+
+    logger_context.info('End of phaze four: Create Data Model')
+    #########################################################################################
+    # Step five: Create BotRuntime instance
+    logger_context.info('Setup phaze five: Creating BotRuntime')
     core.BotRuntime(
         configuration=app_configuration,
         logger=logger_context,
-        discord_token=DISCORD_TOKEN
+        discord_token=DISCORD_TOKEN,
+        data_model=data_model
     )
-    logger_context.info('End of phaze four: Creating BotRuntime')
+    logger_context.info('End of phaze five: Creating BotRuntime')
     #########################################################################################
-    # Step five: Startup bot
-    logger_context.info('Setup phaze five: Startup bot')
+    # Step six: Startup bot
+    logger_context.info('Setup phaze six: Startup bot')
     core.getRuntime().run()
 
 

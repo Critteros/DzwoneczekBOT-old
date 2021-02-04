@@ -20,6 +20,9 @@ from app.BotClient import BotClient
 # Banners
 import app.Logging.Banners.LoggingBanners as Banners
 
+# Data Model
+import app.DataModel as DataModel
+
 #########################################################################################
 
 
@@ -112,7 +115,8 @@ class BotRuntime:
     def __init__(self, *,
                  configuration: configClass.Config,
                  logger: LoggerCore.Logger,
-                 discord_token: str
+                 discord_token: str,
+                 data_model: DataModel.Data
                  ):
         """
         This initiates the BotRuntime and saves information abot current running application, there should be only one instance of this class!
@@ -142,6 +146,9 @@ class BotRuntime:
         logger.info('Attaching discord token to runtime')
         self.discord_token: str = discord_token
 
+        logger.info('Attaching data model to runtime')
+        self.data_model: DataModel.Data = data_model
+
         logger.info('Creating task queque object')
         self.task_queue: queue.Queue = queue.Queue()
         #########################################################################################
@@ -152,7 +159,8 @@ class BotRuntime:
             command_prefix=configuration.command_prefix,
             logger=logger,
             discord_token=discord_token,
-            runtime=self
+            runtime=self,
+            data_model=self.data_model
         )
         logger.info('Done setting up Discord Client')
         #########################################################################################
