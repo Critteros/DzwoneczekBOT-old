@@ -28,20 +28,43 @@ class BotRuntime:
     # Container for tasks
     app_tasks: list = []
 
+    # Decorators
+    # If you do not know how decorators work than skip this part it's called magic
+    #########################################################################################
+
     @classmethod
     def newTask(cls, *args, **kwargs):
         """
             Decorator for adding a coroutine to an event loop
+
+            In more technical point of view this is decorator primer which primes the decorator() function.
+            decorator() function than decorates given function using it's wrapper() function
         """
+
         # Don't even try to understand this magic
         def decorator(function: CoroutineType):
+            """
+                Main decorator which decorates async function
+            Args:
+                function (CoroutineType): [description]
+            """
+
             async def wrapper(*args, **kwargs):
+                """
+                    Wrapper around passed function
+                """
+                # Make sure that bot has connected to discord before doing anything
                 await (getRuntime().client.wait_until_ready())
+                # Original function
                 await function(*args, **kwargs)
 
+            # Append to queque courutine call
             cls.app_tasks.append(wrapper(*args, **kwargs))
+
+            # Return decorated function
             return wrapper
 
+        # Return main decorator from primer decorator
         return decorator
 
     # Instance stuff
