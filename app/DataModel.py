@@ -8,7 +8,10 @@ import json
 import pathlib
 import os
 from datetime import datetime
-from typing import Any
+
+# Types
+from typing import Any, Union
+from pathlib import Path
 #########################################################################################
 # App includes
 
@@ -18,6 +21,36 @@ path_to_data: pathlib.Path = pathlib.Path('data/data.json')
 date_format: str = "%d-%m-%y--%H:%M:%S"
 
 
+class DataAcess:
+    """
+    Class that interfaces with files present on local machine and sychronises
+    them with values stored in ram.
+    """
+
+    def __init__(self, *, filepath: Union[str, Path]) -> None:
+        """
+        Initiates a new instance of DataAccess class
+
+        Args:
+            filepath (Union[str, Path]): filepath to a file that will store data
+        """
+        pass
+
+    pass
+
+
+#########################################################################################
+# Tests
+
+# obj = Data()
+# asyncio.get_event_loop().run_until_complete(
+#     obj.update('', 'test', {"some_key": 1234}))
+
+# print(obj.peek('test'))
+
+
+#########################################################################################
+# Old
 class Data:
     """
     Data Model used in the application
@@ -152,10 +185,3 @@ class Data:
             value[int(var_name)] = new_value
 
         await self.save()
-
-
-# obj = Data()
-# asyncio.get_event_loop().run_until_complete(
-#     obj.update('', 'test', {"some_key": 1234}))
-
-# print(obj.peek('test'))
