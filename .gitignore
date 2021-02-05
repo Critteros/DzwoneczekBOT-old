@@ -4,7 +4,8 @@
 #Logs
 Logs/*
 
-
+#Data files
+data/*
 
 
 #Token files
