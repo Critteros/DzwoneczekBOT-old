@@ -99,7 +99,7 @@ class DataAcess:
         Loads data form a file
         """
         async with self.lock:
-            await self.loop.run_in_executor(None, self._load)
+            await self.loop.run_in_executor(None, self._load_from_file)
 
     def _load_from_file(self) -> None:
         """
