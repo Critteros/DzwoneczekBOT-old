@@ -38,7 +38,7 @@ def main() -> None:
     """
     Quick summary of how application starts:
     1) Configs are loaded from JSONs and parsed
-    2) Setup Loggers    
+    2) Setup Loggers  
     3)Load all needed tokens
     4)Initialize Data Model
     5)Create BotRuntime instance
